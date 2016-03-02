@@ -1,6 +1,9 @@
 # Installs and configures rssh.
 class rssh(
   $package     = 'rssh',
+  $custom_package = false,
+  $custom_package_provider = undef,
+  $custom_package_source = undef,
   $config_file = '/etc/rssh.conf',
   $config_mode = '0644',
   $allow       = [],
@@ -9,9 +12,18 @@ class rssh(
   $chrootpath  = false,
   $users       = []
 ) {
-  package { $package:
-    ensure => present,
-    before => File[$config_file],
+  if $custom_package {
+    package { $package:
+      ensure   => present,
+      provider => $custom_package_provider,
+      source   => $custom_package_source,
+      before   => File[$config_file],
+    }
+  } else {
+    package { $package:
+      ensure => present,
+      before => File[$config_file],
+    }
   }
 
   file { $config_file:
